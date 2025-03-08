@@ -1,11 +1,12 @@
 import express from "express";
 import Order from "../models/orderModel.js";
 import { protect } from "../middleware/authMiddleware.js";
+import { adminProtect } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
 // 🔐 Get all orders (Only for authenticated users)
-router.get("/", protect, async (req, res) => {
+router.get("/", protect,adminProtect, async (req, res) => {
   try {
     const orders = await Order.find().populate("products.product");
     res.json(orders);
@@ -41,7 +42,7 @@ router.post("/", protect, async (req, res) => {
 });
 
 // 🔐 Update an order status (Only for authenticated users)
-router.put("/:id", protect, async (req, res) => {
+router.put("/:id", protect,adminProtect, async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(updatedOrder);
@@ -51,7 +52,7 @@ router.put("/:id", protect, async (req, res) => {
 });
 
 // 🔐 Delete an order (Only for authenticated users)
-router.delete("/:id", protect, async (req, res) => {
+router.delete("/:id", protect,adminProtect, async (req, res) => {
   try {
     await Order.findByIdAndDelete(req.params.id);
     res.json({ message: "Order deleted" });
